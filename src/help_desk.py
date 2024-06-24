@@ -1,13 +1,24 @@
 import sys
 import load_db
 import collections
-from langchain.llms import OpenAI
+from langchain_community.document_loaders import ConfluenceLoader
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_core.prompts import PromptTemplate
+#from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 
+# Import necessary modules
+from langchain_community.llms import GPT4All
+#from langchain import PromptTemplate, 
+from langchain.chains import LLMChain
+
+# Specify the path to your GPT4All model
+model_path = 'Meta-Llama-3-8B-Instruct.Q4_0.gguf'
 
 class HelpDesk():
+
+
+
     """Create the necessary objects to create a QARetrieval chain"""
     def __init__(self, new_db=True):
 
@@ -50,7 +61,10 @@ class HelpDesk():
         return embeddings
 
     def get_llm(self):
-        llm = OpenAI()
+        #llm = OpenAI()
+        # Instantiate the GPT4All model
+        llm = GPT4All(model=model_path, n_threads=8)
+
         return llm
 
     def get_retrieval_qa(self):

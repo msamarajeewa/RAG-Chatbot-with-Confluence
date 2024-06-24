@@ -1,12 +1,14 @@
+import os
 import sys
 import logging
 import shutil
+from atlassian import Confluence
 
 sys.path.append('../')
 from config import (CONFLUENCE_SPACE_NAME, CONFLUENCE_SPACE_KEY,
                     CONFLUENCE_USERNAME, CONFLUENCE_API_KEY, PERSIST_DIRECTORY)
 
-from langchain.document_loaders import ConfluenceLoader
+from langchain_community.document_loaders import ConfluenceLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import MarkdownHeaderTextSplitter
 
@@ -27,18 +29,32 @@ class DataLoader():
         self.space_key = space_key
         self.persist_directory = persist_directory
 
-    def load_from_confluence_loader(self):
-        """Load HTML files from Confluence"""
-        loader = ConfluenceLoader(
+         # Create persist directory if it doesn't exist
+        if not os.path.exists(self.persist_directory):
+            os.makedirs(self.persist_directory)
+
+        # Initialize the loader with required arguments during initialization(added later)
+        self.loader = ConfluenceLoader(
             url=self.confluence_url,
             username=self.username,
-            api_key=self.api_key
+            api_key=self.api_key,
+            space_key=self.space_key  # Pass the space_key during initialization
         )
 
-        docs = loader.load(
-            space_key=self.space_key,
-            # include_attachments=True,
-            )
+    def load_from_confluence_loader(self):
+        """Load HTML files from Confluence"""
+        # loader = ConfluenceLoader(
+        #     url=self.confluence_url,
+        #     username=self.username,
+        #     api_key=self.api_key
+        # )
+
+        # docs = loader.load(
+        #     space_key=self.space_key,
+        #     # include_attachments=True,
+        #     )
+        docs = self.loader.load()
+
         return docs
 
     def split_docs(self, docs):
